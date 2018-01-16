@@ -116,16 +116,30 @@
     if (iterator === undefined ) {
       iterator = _.identity;
     }
-    _.each(array, function (value) {
-      iterateArr.push(iterator(value));
-    });
-    for (var i = 0; i < iterateArr.length; i++) {
-      if (_.indexOf(filteredArr, iterateArr[i]) === -1) {
-        result.push(array[i]);
-        filteredArr.push(iterateArr[i]);
+    if (isSorted === undefined || isSorted === false) {
+      
+      _.each(array, function (value) {
+        iterateArr.push(iterator(value));
+      });
+      for (var i = 0; i < iterateArr.length; i++) {
+        if (_.indexOf(filteredArr, iterateArr[i]) === -1) {
+          result.push(array[i]);
+          filteredArr.push(iterateArr[i]);
+        }
       }
+      return result;
+    } else if (isSorted === true) {
+      for (var i = 0; i < array.length; i++) {
+        if (filteredArr.length === 0) {
+          result.push(array[i]);
+          filteredArr.push(iterator(array[i]));
+        } else if (iterator(array[i]) !== filteredArr[filteredArr.length - 1]) {
+          result.push(array[i]);
+          filteredArr.push(iterator(array[i]));
+        }
+      }
+      return result;
     }
-    return result;
   };
 
 
@@ -188,9 +202,10 @@
       accumulator = collection[0];
       mutateArr = mutateArr.slice(1);
     }
-    for (var i = 0; i < mutateArr.length; i++) {
-      accumulator = iterator(accumulator, mutateArr[i]);
+    for (var key in mutateArr) {
+      accumulator = iterator(accumulator, mutateArr[key]);
     }
+    
     return accumulator;
   };
 
