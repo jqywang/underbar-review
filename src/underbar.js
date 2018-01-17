@@ -249,7 +249,6 @@
     var result = _.every(collection, function (value) {
       return !iterator(value);
     });
-    debugger;
     return !result;
   };
 
@@ -273,11 +272,26 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+    for (var i = 1; i < arguments.length; i++) {
+      for (var key in arguments[i]) {
+        obj[key] = arguments[i][key];
+      }
+    }
+    return obj;
+
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    for (var i = 1; i < arguments.length; i++) {
+      for (var key in arguments[i]) {
+        if (obj[key] === undefined) {
+          obj[key] = arguments[i][key];
+        }
+      }
+    }
+    return obj;
   };
 
 
@@ -321,6 +335,19 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    var result = {};
+    return function(key) {
+      var totalKey = [];
+      for (var i = 0; i < arguments.length; i++) {
+        totalKey[i] = arguments[i];
+      }
+      totalKey.join('');
+      totalKey += typeof key;
+      if (!(totalKey in result)) {
+        result[totalKey] = func.apply(this, arguments);
+      }
+      return result[totalKey];
+    };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -330,6 +357,15 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    var arg = [];
+    for (var i = 2; i < arguments.length; i++) {
+      arg.push(arguments[i]);
+    }
+
+    setTimeout(function() {
+      func.apply(this, arg);
+      console.log(arg);
+    }, wait, arg);
   };
 
 
@@ -344,6 +380,19 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    var getRandom = function (top) {
+      return Math.floor(Math.random() * Math.floor(top + 1));
+    };
+    var result = [];
+    var i = 0;
+    while (i < array.length) {
+      var randomNum = getRandom(array.length - 1);
+      if (result[randomNum] === undefined) {
+        result[randomNum] = array[i];
+        i++;
+      }
+    }
+    return result;
   };
 
 
